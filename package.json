@@ -7,7 +7,7 @@
   "scripts": {
     "test": "test",
     "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js"
   },
   "author": "Prithoo Medhi <prithoo11335@gmail.com>",
   "keywords": [
