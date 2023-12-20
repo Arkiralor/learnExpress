@@ -1,13 +1,21 @@
 import dotenv from "dotenv"
-
 dotenv.config({
     path: "./env"
 })
 
 import connectDatabase from "./database/init.js"
+import { app } from "./app.js"
+import { PORT } from "./constants.js"
 
 connectDatabase()
-
+.then(() => {
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`)
+    })
+})
+.catch((error) => {
+    console.error(`Code fatile: ${error}`)
+})
 
 
 
