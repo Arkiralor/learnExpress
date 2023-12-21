@@ -1,13 +1,13 @@
-import mongoose from "mongoose"
-import uuid from "uuid"
+// import mongoose from "mongoose"
+// import uuid from "uuid"
 
-const patientSchema = new mongoose.Schema(
-    {
+// const patientSchema = new mongoose.Schema(
+//     {
         
-    },
-    {
-        timestamps: true
-    }
-)
+//     },
+//     {
+//         timestamps: true
+//     }
+// )
 
-export const patientModel = new mongoose.model("Patient", patientSchema)
+// export const patientModel = new mongoose.model("Patient", patientSchema)
