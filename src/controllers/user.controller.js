@@ -88,7 +88,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     const user = await userModel.create(userObj)
     
-    const createdUser = await userModel.findById(user._id).select("-refreshToken -password")
+    const createdUser = await userModel.findById(user._id).select("-refreshToken -password -watchHistory")
     if (!createdUser) {
         throw new ApiError(
             500,
@@ -99,7 +99,7 @@ const registerUser = asyncHandler(async (req, res) => {
     res.status(201).json(
         new ApiResponse(
             201,
-            user,
+            createdUser,
             `User ${user.email} created successfully at ${user.createdAt}`
         )
     )
