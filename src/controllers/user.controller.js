@@ -1,9 +1,10 @@
 import { asyncHandler } from "../utils/asyncHandler.js"
-import { JS_IND } from "../constants.js"
+import { JS_IND, emailRegex } from "../constants.js"
 import { ApiError } from "../utils/apiError.js"
-import {ApiResponse} from "../utils/apiResponse.js"
+import { ApiResponse } from "../utils/apiResponse.js"
 import { userModel } from "../models/user.models.js"
 import { uploadToCloudinary } from "../utils/cloudinaryHandler.js"
+import { generateAccessAndRefreshToken } from "../utils/user.model.utils.js"
 
 const registerUser = asyncHandler(async (req, res) => {
 
@@ -68,7 +69,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     const avatarCloud = await uploadToCloudinary(avatarLocalPath)
     const coverImageCloud = await uploadToCloudinary(coverImageLocalPath)
-    
+
 
     if (!avatarCloud) {
         throw new ApiError(
@@ -79,7 +80,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     const userObj = {
         username: username.toLowerCase(),
-        email,
+        email: email.toLowerCase(),
         password,
         fullName,
         avatar: avatarCloud.url,
@@ -87,7 +88,7 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 
     const user = await userModel.create(userObj)
-    
+
     const createdUser = await userModel.findById(user._id).select("-refreshToken -password -watchHistory")
     if (!createdUser) {
         throw new ApiError(
@@ -103,9 +104,36 @@ const registerUser = asyncHandler(async (req, res) => {
             `User ${user.email} created successfully at ${user.createdAt}`
         )
     )
+})
 
-    // console.log(`\{\n${JS_IND}email: ${email},\n${JS_IND}username: ${username},\n${JS_IND}fullName: ${fullName},\n${JS_IND}password: ${password}\n\}`)
+const loginUserViaPassword = asyncHandler(async (req, res) => {
+    const {email, password} = req.body
+
+    if (!password) {
+        throw new ApiError(
+            400, "Bruh...how can you hope to login with this API without a password?"
+        )
+    }
+
+    const foundUser = await userModel.findOne({email: email.toLowerCase()})
+
+    if (!foundUser){
+        throw new ApiError(400, "User not found.")
+    }
+
+    const passwordValid = await foundUser.checkPassword(password)
+    if (!passwordValid){
+        throw new ApiError(400, "Incorrect password.")
+    }
+
+    const tokens = await generateAccessAndRefreshToken(foundUser._id)
+
+    res.status(200).json(new ApiResponse(
+        200, 
+        tokens,
+        `user: ${email} logged in successfully.`
+    ))
 
 })
 
-export { registerUser }
+export { registerUser, loginUserViaPassword }

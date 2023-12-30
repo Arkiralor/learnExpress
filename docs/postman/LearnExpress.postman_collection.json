@@ -1,0 +1,278 @@
+{
+	"info": {
+		"_postman_id": "68b13c32-7e83-4459-ba7c-7f7f45ab8a21",
+		"name": "LearnExpress",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "17779018"
+	},
+	"item": [
+		{
+			"name": "users",
+			"item": [
+				{
+					"name": "createUser",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "{{TEST_USERNAME}}",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "{{TEST_EMAIL}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "{{TEST_PASSWORD}}",
+									"type": "text"
+								},
+								{
+									"key": "fullName",
+									"value": "Fablelord Arkalon",
+									"type": "text"
+								},
+								{
+									"key": "avatar",
+									"type": "file",
+									"src": "/D:/Libraries/Arkiralor's Documents/Programs/gits/learnExpress/data/profile_picture.png"
+								},
+								{
+									"key": "coverImage",
+									"type": "file",
+									"src": "/D:/Libraries/Arkiralor's Documents/Programs/gits/learnExpress/data/AddressIdProof.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/user/register",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"register"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "createUser",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "username",
+											"value": "{{TEST_USERNAME}}",
+											"type": "text"
+										},
+										{
+											"key": "email",
+											"value": "{{TEST_EMAIL}}",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "{{TEST_PASSWORD}}",
+											"type": "text"
+										},
+										{
+											"key": "fullName",
+											"value": "Fablelord Arkalon",
+											"type": "text"
+										},
+										{
+											"key": "avatar",
+											"type": "file",
+											"src": "/D:/Libraries/Arkiralor's Documents/Programs/gits/learnExpress/data/profile_picture.png"
+										},
+										{
+											"key": "coverImage",
+											"type": "file",
+											"src": "/D:/Libraries/Arkiralor's Documents/Programs/gits/learnExpress/data/AddressIdProof.jpg"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/api/v1/user/register",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"user",
+										"register"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "localhost"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "574"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"23e-uYFlnOVWKk9kjOt1r8+EMKz4hgw\""
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 24 Dec 2023 11:53:58 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"statusCode\": 201,\n    \"data\": {\n        \"_id\": \"65881bd6670c6699985e14b7\",\n        \"username\": \"arkiralor92\",\n        \"email\": \"arkalon11235@gmail.com\",\n        \"fullName\": \"Fablelord Arkalon\",\n        \"avatar\": \"http://res.cloudinary.com/learnexpress/image/upload/v1703418832/gayvbift7z7nzlpipo6r.png\",\n        \"coverImage\": \"http://res.cloudinary.com/learnexpress/image/upload/v1703418838/xlhdeycp5zrmvnvizbgt.jpg\",\n        \"createdAt\": \"2023-12-24T11:53:58.480Z\",\n        \"updatedAt\": \"2023-12-24T11:53:58.480Z\",\n        \"__v\": 0\n    },\n    \"message\": \"User arkalon11235@gmail.com created successfully at Sun Dec 24 2023 17:23:58 GMT+0530 (India Standard Time)\",\n    \"success\": true\n}"
+						},
+						{
+							"name": "createUser (Duplicate Data)",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "username",
+											"value": "{{TEST_USERNAME}}",
+											"type": "text"
+										},
+										{
+											"key": "email",
+											"value": "{{TEST_EMAIL}}",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "{{TEST_PASSWORD}}",
+											"type": "text"
+										},
+										{
+											"key": "fullName",
+											"value": "Fablelord Arkalon",
+											"type": "text"
+										},
+										{
+											"key": "avatar",
+											"type": "file",
+											"src": "/D:/Libraries/Arkiralor's Documents/Programs/gits/learnExpress/data/profile_picture.png"
+										},
+										{
+											"key": "coverImage",
+											"type": "file",
+											"src": "/D:/Libraries/Arkiralor's Documents/Programs/gits/learnExpress/data/AddressIdProof.jpg"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/api/v1/user/register",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"user",
+										"register"
+									]
+								}
+							},
+							"status": "Conflict",
+							"code": 409,
+							"_postman_previewlanguage": "html",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "localhost"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Content-Security-Policy",
+									"value": "default-src 'none'"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Content-Type",
+									"value": "text/html; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "444"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 24 Dec 2023 11:52:35 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "<!DOCTYPE html>\n<html lang=\"en\">\n    <head>\n        <meta charset=\"utf-8\">\n        <title>Error</title>\n    </head>\n    <body>\n        <pre>Error: A user with the username: arkiralor92 or email: arkalon11235@gmail.com already exists.\n            <br> &nbsp; &nbsp;at file:///D:/Libraries/Arkiralor&#39;s%20Documents/Programs/gits/learnExpress/src/controllers/user.controller.js:53:15\n            <br> &nbsp; &nbsp;at processTicksAndRejections (node:internal/process/task_queues:96:5)\n        </pre>\n    </body>\n</html>"
+						}
+					]
+				}
+			],
+			"description": "APIs that deal with user-management."
+		}
+	]
+}
