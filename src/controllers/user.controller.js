@@ -1,5 +1,5 @@
 import { asyncHandler } from "../utils/asyncHandler.js"
-import { JS_IND, emailRegex } from "../constants.js"
+import { JS_IND, REFRESH_TOKEN_SECRET, cookieOptions, emailRegex, passwordRegex } from "../constants.js"
 import { ApiError } from "../utils/apiError.js"
 import { ApiResponse } from "../utils/apiResponse.js"
 import { userModel } from "../models/user.models.js"
@@ -36,6 +36,13 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new ApiError(
             400,
             "All fields are required."
+        )
+    }
+
+    if (!passwordRegex.test(password)) {
+        throw new ApiError(
+            400,
+            "Improper password; Must contain at least one: upper case letter, lower case letter, digit and special character."
         )
     }
 
@@ -107,33 +114,79 @@ const registerUser = asyncHandler(async (req, res) => {
 })
 
 const loginUserViaPassword = asyncHandler(async (req, res) => {
-    const {email, password} = req.body
+    const { email, password } = req.body
 
-    if (!password) {
+    if (!email || email === "") {
         throw new ApiError(
-            400, "Bruh...how can you hope to login with this API without a password?"
+            400,
+            "No email provided."
         )
     }
 
-    const foundUser = await userModel.findOne({email: email.toLowerCase()})
+    if (!emailRegex.test(email)) {
+        throw new ApiError(
+            400,
+            `Improper email: ${email}.`
+        )
+    }
 
-    if (!foundUser){
+    if (!password || password === "") {
+        throw new ApiError(
+            400, "No password provided."
+        )
+    }
+
+    const foundUser = await userModel.findOne({ email: email.toLowerCase() })
+
+    if (!foundUser) {
         throw new ApiError(400, "User not found.")
     }
 
     const passwordValid = await foundUser.checkPassword(password)
-    if (!passwordValid){
+    if (!passwordValid) {
         throw new ApiError(400, "Incorrect password.")
     }
 
     const tokens = await generateAccessAndRefreshToken(foundUser._id)
 
-    res.status(200).json(new ApiResponse(
-        200, 
-        tokens,
-        `user: ${email} logged in successfully.`
-    ))
+    res.status(200)
+        .cookie("refreshToken", tokens.refreshToken, cookieOptions)
+        .cookie("accessToken", tokens.accessToken, cookieOptions)
+        .json(new ApiResponse(
+            200,
+            tokens,
+            `user: ${email} logged in successfully.`
+        ))
 
 })
 
-export { registerUser, loginUserViaPassword }
+const refreshUserToken = asyncHandler(async (req, res) => {
+
+})
+
+const logoutUser = asyncHandler(async (req, res) => {
+    const userObj = await userModel.findByIdAndUpdate(
+        req.user._id,
+        {
+            $set: {
+                refreshToken: undefined
+            }
+        },
+        {
+            new: true
+        }
+    )
+
+    res
+        .status(200)
+        .clearCookie("refreshToken", cookieOptions)
+        .clearCookie("accessToken", cookieOptions)
+        .json(
+            new ApiResponse(
+                200,
+                `User '${userObj.email}' logged out successfully.`
+            )
+        )
+})
+
+export { registerUser, loginUserViaPassword, logoutUser }

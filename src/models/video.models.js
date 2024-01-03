@@ -23,6 +23,11 @@ const videoSchema = new Schema(
             type: Number,
             required: true
         },
+        tags: [
+            {
+                type: String
+            }
+        ],
         views: {
             type: Number,
             required: true,

@@ -2,7 +2,7 @@ import express from "express"
 import cors from "cors"
 import cookieParser from "cookie-parser"
 
-import { CORS_ORIGIN } from "./constants.js"
+import { CORS_ORIGIN, SITE_SECRET } from "./constants.js"
 
 const app = express()
 
@@ -22,7 +22,7 @@ app.use(express.urlencoded({
     limit: "16kb"
 }))
 app.use(express.static("public"))
-app.use(cookieParser())
+app.use(cookieParser(SITE_SECRET))
 
 import userRouter from "./routes/user.routes.js"
 
