@@ -5,6 +5,8 @@ import { ApiResponse } from "../utils/apiResponse.js"
 import { userModel } from "../models/user.models.js"
 import { uploadToCloudinary } from "../utils/cloudinaryHandler.js"
 import { generateAccessAndRefreshToken } from "../utils/user.model.utils.js"
+import { blacklistedTokenModel } from "../models/token.models.js"
+import jwt from "jsonwebtoken"
 
 const registerUser = asyncHandler(async (req, res) => {
 
@@ -161,21 +163,66 @@ const loginUserViaPassword = asyncHandler(async (req, res) => {
 })
 
 const refreshUserToken = asyncHandler(async (req, res) => {
+    try {
+        const oldRefreshToken = req.body
+        const decoded = jwt.verify(oldRefreshToken, REFRESH_TOKEN_SECRET)
+        if (!decoded) {
+            throw new ApiError(
+                400,
+                "Invalid Refresh Token."
+            )
+        }
+
+        const userObj = userModel.findById(decoded._id)
+        if (!userObj) {
+            throw new ApiError(
+                400,
+                `User ${decoded._id} no longer registered in the system.`
+            )
+        }
+
+        await blacklistedTokenModel.findOneAndUpdate({ token: userObj.refreshToken }, { blacklistedNow: true })
+
+        const newTokens = await generateAccessAndRefreshToken(userObj._id)
+        await userModel.findOneAndUpdate({ _id: userObj._id }, { refreshToken: newTokens.refreshToken })
+
+        res
+            .status(200)
+            .cookie("refreshToken", newTokens.refreshToken, cookieOptions)
+            .cookie("accessToken", newTokens.accessToken, cookieOptions)
+            .json(new ApiResponse(
+                200,
+                newTokens,
+                `user: ${email} refreshed in successfully.`
+            ))
+    } catch (error) {
+        const errMsg = `Error refreshing tokens: ${error}.`
+        console.error(errMsg)
+        throw new ApiError(
+            500,
+            errMsg
+        )
+    }
 
 })
 
 const logoutUser = asyncHandler(async (req, res) => {
-    const userObj = await userModel.findByIdAndUpdate(
-        req.user._id,
-        {
-            $set: {
-                refreshToken: undefined
-            }
-        },
-        {
-            new: true
-        }
-    )
+    const userObj = await userModel.findById(req.user._id)
+
+    const accessTokenId = await blacklistedTokenModel.findOneAndUpdate({ token: req.rawToken }, { blacklistedNow: true })
+    if (!accessTokenId) {
+        throw new ApiError(
+            500,
+            `Could not logout user: ${req.user.email}.`
+        )
+    }
+    const refreshTokenId = await blacklistedTokenModel.findOneAndUpdate({ token: userObj.refreshToken }, { blacklistedNow: true })
+    if (!refreshTokenId) {
+        throw new ApiError(
+            500,
+            `Could not logout user: ${req.user.email}.`
+        )
+    }
 
     res
         .status(200)
@@ -189,4 +236,4 @@ const logoutUser = asyncHandler(async (req, res) => {
         )
 })
 
-export { registerUser, loginUserViaPassword, logoutUser }
+export { registerUser, loginUserViaPassword, logoutUser, refreshUserToken }

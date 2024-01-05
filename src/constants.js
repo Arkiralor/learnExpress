@@ -16,7 +16,7 @@ export const DB_HOST = process.env.DB_HOST || "localhost"
 export const DB_USERNAME = process.env.DB_USERNAME || "prithoo"
 export const DB_PASSWORD = process.env.DB_PASSWORD || "password"
 export const DB_PORT = process.env.DB_PORT || "5432"
-export const DB_URI = `http://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`
+export const DB_URI = `postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`
 
 export const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
 export const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/;
