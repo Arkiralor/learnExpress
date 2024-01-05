@@ -1,5 +1,5 @@
 import { asyncHandler } from "../utils/asyncHandler.js"
-import { JS_IND, REFRESH_TOKEN_SECRET, cookieOptions, emailRegex, passwordRegex } from "../constants.js"
+import { REFRESH_TOKEN_SECRET, cookieOptions, emailRegex, passwordRegex } from "../constants.js"
 import { ApiError } from "../utils/apiError.js"
 import { ApiResponse } from "../utils/apiResponse.js"
 import { userModel } from "../models/user.models.js"
@@ -7,6 +7,12 @@ import { uploadToCloudinary } from "../utils/cloudinaryHandler.js"
 import { generateAccessAndRefreshToken } from "../utils/user.model.utils.js"
 import { blacklistedTokenModel } from "../models/token.models.js"
 import jwt from "jsonwebtoken"
+
+const getCurrentUser = asyncHandler(async (req, res) => {
+    res
+    .status(200)
+    .json(new ApiResponse(200, req.user, `User ${req.user.email} retrieved successfully.`))
+})
 
 const registerUser = asyncHandler(async (req, res) => {
 
@@ -164,7 +170,7 @@ const loginUserViaPassword = asyncHandler(async (req, res) => {
 
 const refreshUserToken = asyncHandler(async (req, res) => {
     try {
-        const oldRefreshToken = req.body
+        const { oldRefreshToken } = req.body
         const decoded = jwt.verify(oldRefreshToken, REFRESH_TOKEN_SECRET)
         if (!decoded) {
             throw new ApiError(
@@ -184,7 +190,8 @@ const refreshUserToken = asyncHandler(async (req, res) => {
         await blacklistedTokenModel.findOneAndUpdate({ token: userObj.refreshToken }, { blacklistedNow: true })
 
         const newTokens = await generateAccessAndRefreshToken(userObj._id)
-        await userModel.findOneAndUpdate({ _id: userObj._id }, { refreshToken: newTokens.refreshToken })
+        userObj.refreshToken = newTokens.refreshToken
+        await userObj.save()
 
         res
             .status(200)
@@ -209,20 +216,23 @@ const refreshUserToken = asyncHandler(async (req, res) => {
 const logoutUser = asyncHandler(async (req, res) => {
     const userObj = await userModel.findById(req.user._id)
 
-    const accessTokenId = await blacklistedTokenModel.findOneAndUpdate({ token: req.rawToken }, { blacklistedNow: true })
-    if (!accessTokenId) {
+    const accessTokenBlacklisted = await blacklistedTokenModel.findOneAndUpdate({ token: req.rawToken }, { blacklistedNow: true })
+    if (!accessTokenBlacklisted) {
         throw new ApiError(
             500,
             `Could not logout user: ${req.user.email}.`
         )
     }
-    const refreshTokenId = await blacklistedTokenModel.findOneAndUpdate({ token: userObj.refreshToken }, { blacklistedNow: true })
-    if (!refreshTokenId) {
+    const refreshTokenBlacklisted = await blacklistedTokenModel.findOneAndUpdate({ token: userObj.refreshToken }, { blacklistedNow: true })
+    if (!refreshTokenBlacklisted) {
         throw new ApiError(
             500,
             `Could not logout user: ${req.user.email}.`
         )
     }
+
+    userObj.refreshToken = null
+    await userObj.save()
 
     res
         .status(200)
@@ -236,4 +246,44 @@ const logoutUser = asyncHandler(async (req, res) => {
         )
 })
 
-export { registerUser, loginUserViaPassword, logoutUser, refreshUserToken }
+const changeCurrentPassword = asyncHandler(async (req, res) => {
+    const { newPassword, newPasswordRepeated, oldPassword } = req.body
+    if (newPassword !== newPasswordRepeated) {
+        throw new ApiError(
+            400,
+            "New passwords do not match."
+        )
+    }
+    if (newPassword === "" || !passwordRegex.test(newPassword)) {
+        throw new ApiError(
+            400,
+            "Improper password; Must contain at least one: upper case letter, lower case letter, digit and special character."
+        )
+    }
+    const userObj = await userModel.findById(req.user._id)
+
+    const oldPasswordVerified = await userObj.checkPassword(oldPassword)
+    if (!oldPasswordVerified) {
+        throw new ApiError(
+            400,
+            "Password incorrect."
+        )
+    }
+
+    userObj.password = newPassword
+    await userObj.save({validateBeforeSave: false})
+
+    res
+        .status(201)
+        .json(
+            new ApiResponse(
+                201,
+                {
+                    user: `${userObj.email}`
+                },
+                "Password changed successfully."
+            )
+        )
+})
+
+export { getCurrentUser, registerUser, loginUserViaPassword, logoutUser, refreshUserToken, changeCurrentPassword }
