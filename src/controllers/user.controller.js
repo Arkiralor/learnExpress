@@ -9,9 +9,9 @@ import { blacklistedTokenModel } from "../models/token.models.js"
 import jwt from "jsonwebtoken"
 
 const getCurrentUser = asyncHandler(async (req, res) => {
-    res
-    .status(200)
-    .json(new ApiResponse(200, req.user, `User ${req.user.email} retrieved successfully.`))
+    return res
+        .status(200)
+        .json(new ApiResponse(200, req.user, `User ${req.user.email} retrieved successfully.`))
 })
 
 const registerUser = asyncHandler(async (req, res) => {
@@ -112,7 +112,7 @@ const registerUser = asyncHandler(async (req, res) => {
         )
     }
 
-    res.status(201).json(
+    return res.status(201).json(
         new ApiResponse(
             201,
             createdUser,
@@ -157,7 +157,7 @@ const loginUserViaPassword = asyncHandler(async (req, res) => {
 
     const tokens = await generateAccessAndRefreshToken(foundUser._id)
 
-    res.status(200)
+    return res.status(200)
         .cookie("refreshToken", tokens.refreshToken, cookieOptions)
         .cookie("accessToken", tokens.accessToken, cookieOptions)
         .json(new ApiResponse(
@@ -193,7 +193,7 @@ const refreshUserToken = asyncHandler(async (req, res) => {
         userObj.refreshToken = newTokens.refreshToken
         await userObj.save()
 
-        res
+        return res
             .status(200)
             .cookie("refreshToken", newTokens.refreshToken, cookieOptions)
             .cookie("accessToken", newTokens.accessToken, cookieOptions)
@@ -234,7 +234,7 @@ const logoutUser = asyncHandler(async (req, res) => {
     userObj.refreshToken = null
     await userObj.save()
 
-    res
+    return res
         .status(200)
         .clearCookie("refreshToken", cookieOptions)
         .clearCookie("accessToken", cookieOptions)
@@ -271,9 +271,9 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
     }
 
     userObj.password = newPassword
-    await userObj.save({validateBeforeSave: false})
+    await userObj.save({ validateBeforeSave: false })
 
-    res
+    return res
         .status(201)
         .json(
             new ApiResponse(
